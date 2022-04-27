@@ -102,10 +102,7 @@ def load_url_file(img_name, url, mode='RGB'):
     image = request.content
     open(img_name, 'wb').write(image)
 
-    im = PIL.Image.open(img_name)
-    if mode:
-        im = im.convert(mode)
-    return np.array(im)
+    return load_image_file(img_name)
 
 
 def _raw_face_locations(img, number_of_times_to_upsample=1, model="hog"):
