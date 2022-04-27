@@ -14,6 +14,42 @@
    the try-catch segment is over, the requirement, dlib,
    and face_recognition packages are installed
 #>
+
+function Attempt-Command($command) {
+   Try {
+      if ($command){
+         Write-Output "$command is installed"
+      }
+   }
+   Catch {
+      Write-Output "Installing $command..."
+      choco install $command -y
+      Install-Dependencies
+   }
+}
+
+function Attempt-Cmake {
+   Try {   
+      if (cmake) {
+         Write-Output "cmake is installed"
+      }
+   }
+   Catch {
+      choco install cmake --installargs '"ADD_CMAKE_TO_PATH=System"' -y
+      Install-Dependencies
+   }
+}
+
+function Install-Dependencies {
+   Attempt-Command python3
+   Attempt-Command pip
+   Attempt-Cmake
+   RefreshEnv.cmd
+
+   # Proceed with the quick install process for face_recognition
+   pip install dlib
+   pip install face_recognition
+}
 Try {
    if(choco){
       choco upgrade chocolatey -y
@@ -44,41 +80,4 @@ Finally {
    # if they're not already installed. If they are, then Chocolatey
    # automatically skips over it.
    Install-Dependencies
-}
-
-function Attempt-Command($command) {
-   Try {
-      if ($command){
-         Write-Output "$command is installed"
-      }
-   }
-   Catch {
-      Write-Output "Installing $command..."
-      choco install $command -y
-      Install-Dependencies
-   }
-}
-
-function Attempt-Cmake {
-   Try {   
-      if (cmake) {
-         Write-Output "cmake is installed"
-      }
-   }
-   Catch {
-      choco install cmake.install --installargs '"ADD_CMAKE_TO_PATH=User"' -y
-   }
-   Finally {
-      Install-Dependencies
-   }
-}
-
-function Install-Dependencies {
-   Attempt-Command python3
-   Attempt-Command pip
-   Attempt-Cmake
-
-   # Proceed with the quick install process for face_recognition
-   pip install dlib
-   pip install face_recognition
 }
